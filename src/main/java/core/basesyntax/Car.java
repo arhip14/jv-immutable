@@ -1,9 +1,9 @@
 package core.basesyntax;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class Car {
     private final int year;
@@ -14,8 +14,10 @@ public final class Car {
     public Car(int year, String color, List<Wheel> wheels, Engine engine) {
         this.year = year;
         this.color = color;
-        this.wheels = new ArrayList<>(wheels);
-        this.engine = engine;
+        this.engine = engine == null ? null : engine.clone();
+        this.wheels = wheels.stream()
+                .map(Wheel::clone)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public int getYear() {
@@ -27,11 +29,13 @@ public final class Car {
     }
 
     public List<Wheel> getWheels() {
-        return Collections.unmodifiableList(wheels); // Return unmodifiable list
+        return wheels.stream()
+                .map(Wheel::clone)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Engine getEngine() {
-        return engine;
+        return engine == null ? null : engine.clone();
     }
 
     public Car changeEngine(Engine newEngine) {
@@ -43,8 +47,10 @@ public final class Car {
     }
 
     public Car addWheel(Wheel newWheel) {
-        List<Wheel> newWheels = new ArrayList<>(this.wheels);
-        newWheels.add(newWheel);
+        List<Wheel> newWheels = this.wheels.stream()
+                .map(Wheel::clone)
+                .collect(Collectors.toCollection(ArrayList::new));
+        newWheels.add(newWheel.clone());
         return new Car(this.year, this.color, newWheels, this.engine);
     }
 
